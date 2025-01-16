@@ -1,9 +1,13 @@
 #pragma once
 
 #include "Config.h"
+#include "GMLIB/Files/Language/I18n/JsonI18n.h"
+#include "Global.h"
 #include <ll/api/mod/NativeMod.h>
 
 namespace Cleaner {
+
+using namespace GMLIB::Files::I18n;
 
 class Entry {
 
@@ -29,11 +33,14 @@ public:
 
     Config& getConfig();
 
+    JsonI18n& getI18n();
+    
     void saveConfig();
 
 private:
     ll::mod::NativeMod&   mSelf;
     std::optional<Config> mConfig;
+    std::optional<JsonI18n> mI18n;
 };
 
 } // namespace Cleaner

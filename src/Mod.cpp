@@ -16,9 +16,11 @@ bool Entry::enable() {
     mConfig.emplace();
     ll::config::loadConfig(*mConfig, getSelf().getConfigDir() / "config.json");
     saveConfig();
-    I18nAPI::updateOrCreateLanguageFile(getSelf().getLangDir(), "en_US", en_US);
-    I18nAPI::updateOrCreateLanguageFile(getSelf().getLangDir(), "zh_CN", zh_CN);
-    I18nAPI::loadLanguagesFromDirectory(getSelf().getLangDir());
+    mI18n.emplace(getSelf().getLangDir(), mConfig->language);
+    mI18n->updateOrCreateLanguage("en_US", en_US);
+    mI18n->updateOrCreateLanguage("zh_CN", zh_CN);
+    mI18n->loadAllLanguages();
+    mI18n->chooseLanguage(mConfig->language); // maybe
     Cleaner::ListenEvents();
     RegisterCommands();
     Cleaner::loadCleaner();
@@ -38,10 +40,12 @@ Config& Entry::getConfig() { return mConfig.value(); }
 
 void Entry::saveConfig() { ll::config::saveConfig(*mConfig, getSelf().getConfigDir() / "config.json"); }
 
+JsonI18n& Entry::getI18n() { return mI18n.value(); }
+
 } // namespace Cleaner
 
 LL_REGISTER_MOD(Cleaner::Entry, Cleaner::Entry::getInstance());
 
 std::string tr(std::string const& key, std::vector<std::string> const& params) {
-    return I18nAPI::get(key, params, Cleaner::Entry::getInstance().getConfig().language);
+    return Cleaner::Entry::getInstance().getI18n().get(key, params);
 }
